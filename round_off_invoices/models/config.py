@@ -49,7 +49,8 @@ class AccountRoundOff(models.Model):
 
     def get_round_active(self):
         ir_values = self.env['ir.values']
-        self.round_active = ir_values.get_default('account.config.settings', 'round_off')
+        for i in self:
+            i.round_active = ir_values.get_default('account.config.settings', 'round_off')
 
     @api.one
     @api.depends('invoice_line_ids.price_subtotal', 'tax_line_ids.amount', 'currency_id', 'company_id',
@@ -190,7 +191,7 @@ class AccountRoundOff(models.Model):
                         'price': total + self.round_off_value,
                         'account_id': inv.account_id.id,
                         'date_maturity': inv.date_due,
-                        'amount_currency': diff_currency and amount_currency,
+                        'amount_currency': diff_currency and total_currency,
                         'currency_id': diff_currency and inv.currency_id.id,
                         'invoice_id': inv.id
                     })
@@ -202,7 +203,7 @@ class AccountRoundOff(models.Model):
                         'price': -self.round_off_value,
                         'account_id': acc_id,
                         'date_maturity': inv.date_due,
-                        'amount_currency': diff_currency and amount_currency,
+                        'amount_currency': diff_currency and total_currency,
                         'currency_id': diff_currency and inv.currency_id.id,
                         'invoice_id': inv.id
                     })
